@@ -1,0 +1,19 @@
+{
+  "name": "cl",
+  "version": "1.0.0",
+  "description": "Command line running of bs",
+  "main": "bs.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/plivesey/bs.git"
+  },
+  "author": "Peter Livesey",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/plivesey/bs/issues"
+  },
+  "homepage": "https://github.com/plivesey/bs#readme"
+}
