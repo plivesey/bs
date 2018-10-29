@@ -1,7 +1,17 @@
-exports.neverCall = function() {
-    return false
+const Player = require('./player.js').Player
+
+exports.NeverCall = class NeverCall {
+    callBullshit() {
+        return false
+    }
 }
 
-exports.callPercentage = function() {
-    return Math.random() < 0.5
+exports.CallPercentage = class CallPercentage {
+    constructor(percentage) {
+        this.percentage = percentage
+    }
+
+    callBullshit() {
+        return Math.random() < this.percentage
+    }
 }
