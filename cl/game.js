@@ -53,8 +53,10 @@ class Game {
     playGame() {
         return this.playTurn().then((result) => {
             const winner = this.gameWon()
-            if (winner !== false) {
+            if (winner >= 0) {
                 return winner
+            } else if (this.gameDrawn()) {
+                return -1
             } else {
                 return this.playGame()
             }
@@ -68,10 +70,24 @@ class Game {
             }
         }
 
-        return false
+        return -1
+    }
+
+    gameDrawn() {
+        if (this.turnNumber > 10000) {
+            return true
+        }
+
+        return this.hands[0].drawnHand() && this.hands[1].drawnHand() && this.hands[2].drawnHand() && this.hands[3].drawnHand()
     }
 
     playTurn() {
+        if (!this.turnNumber) {
+            this.turnNumber = 0
+        }
+
+        this.turnNumber++
+
         const gameState = this.gameStateForPlayer(this.turn)
 
         // Ask the player what he wants to do
@@ -131,6 +147,9 @@ class Game {
     informPlayersOfRoundSummary(playerIndex, cardsPlayed, bullshitCalled, callingPlayer, playerLied) {
         const callingPlayerAdjusted = bullshitCalled ? this.indexOfPlayerInRelationToCurrentPlayer(callingPlayer, playerIndex) : 0
         const state = this.summaryState(playerIndex, cardsPlayed, bullshitCalled, callingPlayerAdjusted, playerLied)
+        // if (playerIndex === 0) {
+        //     console.log(state)
+        // }
         return this.players[playerIndex].roundSummary(state).then(() => {
             if (playerIndex + 1 < 4) {
                 return this.informPlayersOfRoundSummary(playerIndex + 1, cardsPlayed, bullshitCalled, callingPlayer, playerLied)
@@ -186,6 +205,16 @@ class Hand {
             total += this[i]
         }
         return total
+    }
+
+    drawnHand() {
+        for (var i = 1; i <= 13; i++) {
+            if (this[i] != 4 || this[i] !== 0) {
+                return false
+            }
+        }
+
+        return true
     }
 
     addCards(cards) {
