@@ -129,14 +129,14 @@ var playGamesAgainstSpecificOpponent = function (total, opponent, playingStrateg
 
 var totalWins = 0
 var promises = []
-for (var i = 0; i < 10; i++) {
+for (var i = 0; i < 50; i++) {
     promises.push(playGamesAgainstRandomOpponents(100).then((wins) => {
         totalWins += wins
     }))
 }
 
 const playAgainstRandomOpponents = sequential(promises).then(() => {
-    console.log('Results: ' + totalWins + ' / 1000')
+    console.log('Results: ' + totalWins + ' / 5000')
 });
 
 var otherGamePromises = []
