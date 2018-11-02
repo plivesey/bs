@@ -1,5 +1,3 @@
-const Player = require('./player.js').Player
-
 function alwaysCall(state) {
     if (state.playerTurn == 3 && state.otherPlayerCards[2] === 0) {
         return true
@@ -46,6 +44,26 @@ exports.Call50Percent = class Lie10Percent extends CallPercentage {
     }
 }
 
+exports.CallIfLieNeeded = class CallIfLieNeeded {
+    callBullshit(state) {
+        if (alwaysCall(state)) {
+            return true
+        }
+
+        const imNext = state.playerTurn === 3
+        var nextCard = state.currentCard + 1
+        if (nextCard > 13) {
+            nextCard = 13
+        }
+
+        if (imNext && state.hand[nextCard] === 0) {
+            return true
+        } else {
+            return false
+        }
+    }
+}
+
 /**
  * Starts with a chance of calling out each player. Then, doubles this every time the player lies and halves it when they don't lie.
  */
@@ -77,18 +95,6 @@ exports.CallUpdatingPercentage = class CallUpdatingPercentage {
     }
 }
 
-function factorial(x) {
-    if (x <= 0) {
-        return 1
-    }
-
-    return x * factorial(x - 1)
-}
-
-function choose(n, k) {
-    return factorial(n) / (factorial(k) * factorial(n - k))
-}
-
 exports.CallPercentageOnWinner = class CallPercentageOnWinner {
     constructor(percentage) {
         this.percentage = percentage
@@ -108,6 +114,20 @@ exports.CallPercentageOnWinner = class CallPercentageOnWinner {
         }
 
         return Math.random() < this.percentage
+    }
+}
+
+exports.Collector = class Collector {
+    callBullshit(state) {
+        if (alwaysCall(state)) {
+            return true
+        }
+
+        if (state.hand[state.currentCard] + state.numberOfCardsPlayed === 4) {
+            return true
+        } else {
+            return false
+        }
     }
 }
 
@@ -156,4 +176,16 @@ exports.CallUnlikely = class CallUnlikely {
 
         return chanceOfHavingASpecificCard(playerCards, 4 - hand[currentCard], numberOfCardsPlayed, 52 - hand.count()) < 0.1
     }
+}
+
+function factorial(x) {
+    if (x <= 0) {
+        return 1
+    }
+
+    return x * factorial(x - 1)
+}
+
+function choose(n, k) {
+    return factorial(n) / (factorial(k) * factorial(n - k))
 }

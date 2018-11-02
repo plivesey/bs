@@ -147,9 +147,7 @@ class Game {
     informPlayersOfRoundSummary(playerIndex, cardsPlayed, bullshitCalled, callingPlayer, playerLied) {
         const callingPlayerAdjusted = bullshitCalled ? this.indexOfPlayerInRelationToCurrentPlayer(callingPlayer, playerIndex) : 0
         const state = this.summaryState(playerIndex, cardsPlayed, bullshitCalled, callingPlayerAdjusted, playerLied)
-        // if (playerIndex === 0) {
-        //     console.log(state)
-        // }
+        
         return this.players[playerIndex].roundSummary(state).then(() => {
             if (playerIndex + 1 < 4) {
                 return this.informPlayersOfRoundSummary(playerIndex + 1, cardsPlayed, bullshitCalled, callingPlayer, playerLied)

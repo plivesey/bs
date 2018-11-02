@@ -9,7 +9,12 @@ const playingStrategies = {
     'AvoidLying': require('./playFunctions').AvoidLying,
     'Lie10Percent': require('./playFunctions').Lie10Percent,
     'Lie50Percent': require('./playFunctions').Lie50Percent,
-    'AlwaysLie': require('./playFunctions').AlwaysLie
+    'AlwaysLie': require('./playFunctions').AlwaysLie,
+    'AlwaysLieOnSingles': require('./playFunctions').AlwaysLieOnSingles,
+    'ExpectedValueLiar': require('./playFunctions').ExpectedValueLiar,
+    'Closer': require('./playFunctions').Closer,
+    'RallyTime': require('./playFunctions').RallyTime,
+    'LyingCloser': require('./playFunctions').LyingCloser
 }
 
 const callingStrategies = {
@@ -18,7 +23,9 @@ const callingStrategies = {
     'Call50Percent': require('./callFunctions').Call50Percent,
     'CallUpdatingPercentage': require('./callFunctions').CallUpdatingPercentage,
     'CallPercentageOnWinner': require('./callFunctions').CallPercentageOnWinner,
-    'CallUnlikely': require('./callFunctions').CallUnlikely
+    'CallUnlikely': require('./callFunctions').CallUnlikely,
+    'CallIfLieNeeded': require('./callFunctions').CallIfLieNeeded,
+    'Collector': require('./callFunctions').Collector,
 }
 
 const playingStrategy = playingStrategies[args[0]]
@@ -48,34 +55,116 @@ const createPlayer = () => {
     }
 }
 
-var winCount = 0
-var total = 0
-for (var i = 0; i < 1000; i++) {
-    const playerNumber = Math.floor(Math.random() * 4)
-    const players = []
-    for (var j = 0; j < 4; j++) {
-        if (j === playerNumber) {
-            players.push(createPlayer())
-        } else {
-            players.push(playerWithRandomStrategies(otherPlayingStrategies, otherCallingStrategies))
+var playGamesAgainstRandomOpponents = function (total) {
+    var promises = []
+    for (var i = 0; i < total; i++) {
+        const playerNumber = Math.floor(Math.random() * 4)
+        const players = []
+        for (var j = 0; j < 4; j++) {
+            if (j === playerNumber) {
+                players.push(createPlayer())
+            } else {
+                players.push(playerWithRandomStrategies(otherPlayingStrategies, otherCallingStrategies))
+            }
         }
+
+        const game = new Game(players)
+        promises.push(game.playGame().then((result) => {
+            if (result === playerNumber) {
+                return 1
+            } else if (result === -1) {
+                return 0.25
+            } else {
+                return 0
+            }
+        }))
     }
 
-    const game = new Game(players)
-    game.playGame().then((result) => {
-        if (result === playerNumber) {
-            winCount++;
-        } else if (result === -1) {
-            winCount += 0.25
+    return Promise.all(promises).then((results) => {
+        var count = 0
+        for (var i = 0; i < results.length; ++i) {
+            count += results[i]
         }
 
-        total++;
-
-        if (total === 1000) {
-            console.log(winCount + ' / ' + total)
-        }
+        return count
     })
 }
+
+var playGamesAgainstSpecificOpponent = function (total, opponent, playingStrategy) {
+    var promises = []
+    for (var i = 0; i < total; i++) {
+        const playerNumber = Math.floor(Math.random() * 4)
+        const players = []
+        for (var j = 0; j < 4; j++) {
+            if (j === playerNumber) {
+                players.push(createPlayer())
+            } else if (playingStrategy) {
+                players.push(playerWithRandomCallingStrategy(opponent, otherCallingStrategies))
+            } else {
+                players.push(playerWithRandomPlayingStrategy(otherPlayingStrategies, opponent))
+            }
+        }
+
+        const game = new Game(players)
+        promises.push(game.playGame().then((result) => {
+            if (result === playerNumber) {
+                return 1
+            } else if (result === -1) {
+                return 0.25
+            } else {
+                return 0
+            }
+        }))
+    }
+
+    return Promise.all(promises).then((results) => {
+        var count = 0
+        for (var i = 0; i < results.length; ++i) {
+            count += results[i]
+        }
+
+        return count
+    })
+}
+
+var totalWins = 0
+var promises = []
+for (var i = 0; i < 10; i++) {
+    promises.push(playGamesAgainstRandomOpponents(100).then((wins) => {
+        totalWins += wins
+    }))
+}
+
+const playAgainstRandomOpponents = sequential(promises).then(() => {
+    console.log('Results: ' + totalWins + ' / 1000')
+});
+
+var otherGamePromises = []
+for (var key in playingStrategies) {
+    const saveKey = key
+    if (key !== args[0]) {
+        otherGamePromises.push(playGamesAgainstSpecificOpponent(100, playingStrategies[key], true).then((result) => {
+            console.log('Against ' + saveKey + ': ' + result + ' / 100')
+        }))
+    }
+}
+
+for (var key in callingStrategies) {
+    const saveKey = key
+    if (key !== args[0]) {
+        otherGamePromises.push(playGamesAgainstSpecificOpponent(100, callingStrategies[key], false).then((result) => {
+            console.log('Against ' + saveKey + ': ' + result + ' / 100')
+        }))
+    }
+}
+
+const playAgainstSpecificOpponents = sequential(otherGamePromises)
+
+playAgainstRandomOpponents.then(() => {
+    return playAgainstSpecificOpponents
+})
+
+// Helper functions
 
 function playerWithRandomStrategies(playing, calling) {
     const playingStrategy = randomArrayElement(playing)
@@ -98,4 +187,12 @@ function playerWithRandomPlayingStrategy(playing, callingStrategy) {
 
 function randomArrayElement(array) {
     return array[Math.floor(Math.random() * array.length)]
+}
+
+function sequential(promises) {
+    return promises.reduce((chain, current) => {
+        return chain.then(() => {
+            return current
+        })
+    }, Promise.resolve())
 }
