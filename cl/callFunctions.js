@@ -95,9 +95,9 @@ exports.CallUpdatingPercentage = class CallUpdatingPercentage {
     }
 }
 
-exports.CallPercentageOnWinner = class CallPercentageOnWinner {
+exports.CallPercentageOnWinner = class CallPercentageOnWinner extends CallPercentage {
     constructor(percentage) {
-        this.percentage = percentage
+        super(0.1)
     }
 
     callBullshit(state) {
@@ -111,9 +111,9 @@ exports.CallPercentageOnWinner = class CallPercentageOnWinner {
 
         if (state.otherPlayerCards[state.playerTurn - 1] !== winningNumberOfCards) {
             return false
+        } else {
+            return super.callBullshit(state)
         }
-
-        return Math.random() < this.percentage
     }
 }
 

@@ -17,6 +17,18 @@ const playingStrategies = {
     'LyingCloser': require('./playFunctions').LyingCloser
 }
 
+const orderedPlayingStrategies = [
+    'AvoidLying',
+    'Lie10Percent',
+    'Lie50Percent',
+    'AlwaysLie',
+    'AlwaysLieOnSingles',
+    'ExpectedValueLiar',
+    'Closer',
+    'RallyTime',
+    'LyingCloser',
+]
+
 const callingStrategies = {
     'NeverCall': require('./callFunctions').NeverCall,
     'Call10Percent': require('./callFunctions').Call10Percent,
@@ -27,6 +39,17 @@ const callingStrategies = {
     'CallIfLieNeeded': require('./callFunctions').CallIfLieNeeded,
     'Collector': require('./callFunctions').Collector,
 }
+
+const orderedCallingStrategies = [
+    'NeverCall',
+    'Call10Percent',
+    'Call50Percent',
+    'CallUpdatingPercentage',
+    'CallPercentageOnWinner',
+    'CallUnlikely',
+    'CallIfLieNeeded',
+    'Collector',
+]
 
 const playingStrategy = playingStrategies[args[0]]
 const callingStrategy = callingStrategies[args[0]]
@@ -55,7 +78,7 @@ const createPlayer = () => {
     }
 }
 
-var playGamesAgainstRandomOpponents = function (total) {
+var playGamesAgainstRandomOpponents = function(total) {
     var promises = []
     for (var i = 0; i < total; i++) {
         const playerNumber = Math.floor(Math.random() * 4)
@@ -130,37 +153,54 @@ var playGamesAgainstSpecificOpponent = function (total, opponent, playingStrateg
 var totalWins = 0
 var promises = []
 for (var i = 0; i < 50; i++) {
-    promises.push(playGamesAgainstRandomOpponents(100).then((wins) => {
-        totalWins += wins
-    }))
+    promises.push(
+        () => {
+            return playGamesAgainstRandomOpponents(100).then((wins) => {
+                totalWins += wins
+            })
+        }
+    )
+}
+
+var otherGamePromises = []
+for (var i = 0; i<orderedPlayingStrategies.length; i++) {
+    const key = orderedPlayingStrategies[i]
+    if (key !== args[0]) {
+        otherGamePromises.push(
+            () => {
+                return playGamesAgainstSpecificOpponent(300, playingStrategies[key], true).then((result) => {
+                    const percentage = result / 3
+                    // console.log(percentage + '%' + ' - ' + key)
+                    console.log(percentage + '%')
+                })
+            }
+        )
+    }
+}
+
+for (var i = 0; i<orderedCallingStrategies.length; i++) {
+    const key = orderedCallingStrategies[i]
+    if (key !== args[0]) {
+        otherGamePromises.push(
+            () => {
+                return playGamesAgainstSpecificOpponent(300, callingStrategies[key], false).then((result) => {
+                    const percentage = result / 3
+                    // console.log(percentage + '% - ' + key)
+                    console.log(percentage + '%')
+                })
+            }
+        )
+    }
 }
 
 const playAgainstRandomOpponents = sequential(promises).then(() => {
-    console.log('Results: ' + totalWins + ' / 5000')
+    const percent = totalWins / 5000 * 100
+    // console.log(percent + '% - Wins against random opponents with 5000 plays')
+    console.log(percent + '%')
 });
 
-var otherGamePromises = []
-for (var key in playingStrategies) {
-    const saveKey = key
-    if (key !== args[0]) {
-        otherGamePromises.push(playGamesAgainstSpecificOpponent(100, playingStrategies[key], true).then((result) => {
-            console.log('Against ' + saveKey + ': ' + result + ' / 100')
-        }))
-    }
-}
-
-for (var key in callingStrategies) {
-    const saveKey = key
-    if (key !== args[0]) {
-        otherGamePromises.push(playGamesAgainstSpecificOpponent(100, callingStrategies[key], false).then((result) => {
-            console.log('Against ' + saveKey + ': ' + result + ' / 100')
-        }))
-    }
-}
-
-const playAgainstSpecificOpponents = sequential(otherGamePromises)
-
 playAgainstRandomOpponents.then(() => {
+    const playAgainstSpecificOpponents = sequential(otherGamePromises)
     return playAgainstSpecificOpponents
 })
 
@@ -192,7 +232,7 @@ function randomArrayElement(array) {
 function sequential(promises) {
     return promises.reduce((chain, current) => {
         return chain.then(() => {
-            return current
+            return current()
         })
     }, Promise.resolve())
 }
