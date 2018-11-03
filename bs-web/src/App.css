@@ -1,9 +1,18 @@
-.App {
-  text-align: center;
-}
-
 div {
   padding: 4px;
+}
+
+.App {
+  text-align: center;
+  padding: 0;
+}
+
+#root {
+  padding: 0;
+}
+
+button {
+  margin: 2px;
 }
 
 .App-logo {
