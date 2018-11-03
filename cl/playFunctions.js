@@ -10,7 +10,7 @@ exports.AvoidLying = class AvoidLying {
         if (cards.length > 0) {
             return cards
         } else {
-            return ideaLyingCardFromHand(state.hand, state.currentCard)
+            return [ideaLyingCardFromHand(state.hand, state.currentCard)]
         }
     }
 }
@@ -35,7 +35,7 @@ class LiePercentage {
 
             return cards
         } else {
-            return ideaLyingCardFromHand(state.hand, state.currentCard)
+            return [ideaLyingCardFromHand(state.hand, state.currentCard)]
         }
     }
 }
@@ -147,7 +147,7 @@ class ExpectedValueLiar {
         const handCount = state.hand.count() + cards.length
         // console.log('hand count: ' + handCount + ' current hand: ' + cards + ' extra cards: ' + extraCards + ' discard: ' + state.discardSize + ' values: ' + expectedValueForOneCard + ' - ' + expectedValueForTwoCards + ' - ' + expectedValueForThreeCards)
 
-        for (var i = 0; i<extraCards; i++) {
+        for (var i = 0; i < extraCards; i++) {
             if (state.hand.count() > 0 && cards.length < 4) {
                 var card = ideaLyingCardFromHand(state.hand, state.currentCard)
                 cards.push(ideaLyingCardFromHand(state.hand, state.currentCard))
@@ -234,19 +234,57 @@ exports.Closer = class Closer extends ExpectedValueLiar {
     }
 }
 
-exports.RallyTime = class RallyTime extends LiePercentage {
+class RallyTime extends LiePercentage {
     constructor() {
         super(0)
     }
 
     playHand(state) {
-        if (state.hand.count() >= state.otherPlayerCards[0] && state.hand.count() >= state.otherPlayerCards[1] && state.hand.count() >= state.otherPlayerCards[2]) {
-            this.percentage = 1
+        var numberOfBetterPlayers = 0
+        if (state.hand.count() >= state.otherPlayerCards[0]) {
+            numberOfBetterPlayers++
+        }
+
+        if (state.hand.count() >= state.otherPlayerCards[1]) {
+            numberOfBetterPlayers++
+        }
+
+        if (state.hand.count() >= state.otherPlayerCards[2]) {
+            numberOfBetterPlayers++
+        }
+
+        if (numberOfBetterPlayers === 3) {
+            this.percentage = 0.75
+        } else if (numberOfBetterPlayers === 2) {
+            this.percentage = 0.15
         } else {
             this.percentage = 0
         }
 
         return super.playHand(state)
+    }
+}
+
+exports.RallyTime = RallyTime
+
+exports.RallyCloser = class RallyCloser extends RallyTime {
+    playHand(state) {
+        const closing = canFinishWithoutLying(state.currentCard, state.hand, 0)
+
+        if (closing) {
+            var cards = []
+            for (var i = 0; i < state.hand[state.currentCard]; i++) {
+                cards.push(state.currentCard)
+            }
+
+            state.hand[state.currentCard] = 0
+
+            assert(cards.length > 0, 'Closing thought he could close, but didnt have the current card - ' + state.currentCard + ' - ' + state.hand)
+
+            return cards
+        } else {
+            return super.playHand(state)
+        }
     }
 }
 
@@ -268,7 +306,7 @@ function ideaLyingCardFromHand(hand, currentTurn) {
 }
 
 function canFinishWithoutLying(currentCard, hand, numberOfCardsUsed) {
-    if (hand.count() >= numberOfCardsUsed) {
+    if (numberOfCardsUsed >= hand.count()) {
         return true
     }
 
@@ -281,5 +319,5 @@ function canFinishWithoutLying(currentCard, hand, numberOfCardsUsed) {
         nextCard -= 13
     }
 
-    return this.canFinishWithoutLying(nextCard, hand, numberOfCardsUsed + hand[currentCard])
+    return canFinishWithoutLying(nextCard, hand, numberOfCardsUsed + hand[currentCard])
 }

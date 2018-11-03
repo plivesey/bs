@@ -92,6 +92,9 @@ class Game {
 
         // Ask the player what he wants to do
         return this.players[this.turn].playHand(gameState).then((discardedCards) => {
+            assert(Array.isArray(discardedCards), 'discardedCards isnt an array: ' + discardedCards + ' playing: ' + this.turn)
+            assert(discardedCards.length > 0, 'player: ' + this.turn + ' returned no cards for a play.')
+
             const hand = this.hands[this.turn]
 
             // Discard the cards
@@ -222,13 +225,18 @@ class Hand {
     }
 
     toString() {
+        return '' + this.toArray()
+    }
+
+    toArray() {
         var cards = []
         for (var i = 1; i <= 13; i++) {
             for (var j = 0; j < this[i]; j++) {
                 cards.push(i)
             }
         }
-        return '' + cards
+        return cards
+
     }
 }
 
@@ -275,4 +283,4 @@ class Deck {
     }
 }
 
-exports.Game = Game
+module.exports.Game = Game

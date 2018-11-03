@@ -15,5 +15,6 @@
   "bugs": {
     "url": "https://github.com/plivesey/bs/issues"
   },
-  "homepage": "https://github.com/plivesey/bs#readme"
+  "homepage": "https://github.com/plivesey/bs#readme",
+  "dependencies": {}
 }

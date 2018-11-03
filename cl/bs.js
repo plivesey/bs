@@ -5,50 +5,53 @@ const SyncPlayer = require('./player').SyncPlayer
 
 const args = process.argv.slice(2);
 
+// Bad strategies have been commented out
 const playingStrategies = {
     'AvoidLying': require('./playFunctions').AvoidLying,
     'Lie10Percent': require('./playFunctions').Lie10Percent,
-    'Lie50Percent': require('./playFunctions').Lie50Percent,
-    'AlwaysLie': require('./playFunctions').AlwaysLie,
+    // 'Lie50Percent': require('./playFunctions').Lie50Percent,
+    // 'AlwaysLie': require('./playFunctions').AlwaysLie,
     'AlwaysLieOnSingles': require('./playFunctions').AlwaysLieOnSingles,
     'ExpectedValueLiar': require('./playFunctions').ExpectedValueLiar,
     'Closer': require('./playFunctions').Closer,
     'RallyTime': require('./playFunctions').RallyTime,
-    'LyingCloser': require('./playFunctions').LyingCloser
+    'LyingCloser': require('./playFunctions').LyingCloser,
+    'RallyCloser': require('./playFunctions').RallyCloser,
 }
 
 const orderedPlayingStrategies = [
     'AvoidLying',
     'Lie10Percent',
-    'Lie50Percent',
-    'AlwaysLie',
+    // 'Lie50Percent',
+    // 'AlwaysLie',
     'AlwaysLieOnSingles',
     'ExpectedValueLiar',
     'Closer',
     'RallyTime',
     'LyingCloser',
+    'RallyCloser'
 ]
 
 const callingStrategies = {
     'NeverCall': require('./callFunctions').NeverCall,
     'Call10Percent': require('./callFunctions').Call10Percent,
-    'Call50Percent': require('./callFunctions').Call50Percent,
+    // 'Call50Percent': require('./callFunctions').Call50Percent,
     'CallUpdatingPercentage': require('./callFunctions').CallUpdatingPercentage,
     'CallPercentageOnWinner': require('./callFunctions').CallPercentageOnWinner,
     'CallUnlikely': require('./callFunctions').CallUnlikely,
     'CallIfLieNeeded': require('./callFunctions').CallIfLieNeeded,
-    'Collector': require('./callFunctions').Collector,
+    // 'Collector': require('./callFunctions').Collector,
 }
 
 const orderedCallingStrategies = [
     'NeverCall',
     'Call10Percent',
-    'Call50Percent',
+    // 'Call50Percent',
     'CallUpdatingPercentage',
     'CallPercentageOnWinner',
     'CallUnlikely',
     'CallIfLieNeeded',
-    'Collector',
+    // 'Collector',
 ]
 
 const playingStrategy = playingStrategies[args[0]]
