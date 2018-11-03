@@ -13,9 +13,9 @@ const playingStrategies = {
     // 'AlwaysLie': require('./playFunctions').AlwaysLie,
     'AlwaysLieOnSingles': require('./playFunctions').AlwaysLieOnSingles,
     'ExpectedValueLiar': require('./playFunctions').ExpectedValueLiar,
-    'Closer': require('./playFunctions').Closer,
+    // 'Closer': require('./playFunctions').Closer,
     'RallyTime': require('./playFunctions').RallyTime,
-    'LyingCloser': require('./playFunctions').LyingCloser,
+    // 'LyingCloser': require('./playFunctions').LyingCloser,
     'RallyCloser': require('./playFunctions').RallyCloser,
 }
 
@@ -26,9 +26,9 @@ const orderedPlayingStrategies = [
     // 'AlwaysLie',
     'AlwaysLieOnSingles',
     'ExpectedValueLiar',
-    'Closer',
+    // 'Closer',
     'RallyTime',
-    'LyingCloser',
+    // 'LyingCloser',
     'RallyCloser'
 ]
 

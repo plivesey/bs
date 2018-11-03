@@ -2,20 +2,21 @@ import React, { Component } from 'react';
 import './App.css';
 import { Game } from 'cl/game'
 import { Player, SyncPlayer } from 'cl/player'
-import { NeverCall, CallUpdatingPercentage, CallPercentageOnWinner } from 'cl/callFunctions'
-import { AvoidLying, Closer, LyingCloser, RallyCloser } from 'cl/playFunctions'
+import { NeverCall, CallUpdatingPercentage, CallPercentageOnWinner, CallIfLieNeeded } from 'cl/callFunctions'
+import { AvoidLying, RallyCloser, Lie10Percent, RallyTime } from 'cl/playFunctions'
 
 const playingStrategies = {
   'AvoidLying': AvoidLying,
-  'Closer': Closer,
-  'LyingCloser': LyingCloser,
   'RallyCloser': RallyCloser,
+  'Lie10Percent': Lie10Percent,
+  'RallyTime': RallyTime
 }
 
 const callingStrategies = {
   'NeverCall': NeverCall,
   'CallUpdatingPercentage': CallUpdatingPercentage,
-  'CallPercentageOnWinner': CallPercentageOnWinner
+  'CallPercentageOnWinner': CallPercentageOnWinner,
+  'CallIfLieNeeded': CallIfLieNeeded
 }
 
 class HumanPlayer extends Player {
@@ -75,15 +76,16 @@ class GameComponenet extends Component {
   startNewGame() {
     const goodPlayingStrategies = [
       'AvoidLying',
-      'Closer',
-      'LyingCloser',
-      'RallyCloser'
+      'RallyCloser',
+      'Lie10Percent',
+      'RallyTime'
     ]
 
     const goodCallingStrategies = [
       'NeverCall',
       'CallUpdatingPercentage',
-      'CallPercentageOnWinner'
+      'CallPercentageOnWinner',
+      'CallIfLieNeeded'
     ]
 
     function randomArrayElement(array) {
@@ -278,15 +280,16 @@ class GameComponenet extends Component {
   opponentDescription(index) {
     const playingDescription = {
       'AvoidLying': 'Avoids lying whenever possible',
-      'Closer': "If they can win without lying, they don't lie. Otherwise, they lie if the expected value of lying is worth it",
-      'LyingCloser': "If they can win without lying, they don't lie. Otherwise, they always lie",
-      'RallyCloser': "If they can win without lying, they don't lie. Otherwise, they lie only when they are losing"
+      'RallyCloser': "If they can win without lying, they don't lie. Otherwise, they lie only when they are losing",
+      'Lie10Percent': "Lies ten percent of the time",
+      'RallyTime': "Only lies when losing"
     }
     
     const callingDescriptions = {
       'NeverCall': 'never calls bullshit unless they would immediately lose.',
       'CallUpdatingPercentage': 'keeps track of how many people lie and calls bullshit if they lie often.',
-      'CallPercentageOnWinner': 'only calls bullshit on the winner every so often.'
+      'CallPercentageOnWinner': 'only calls bullshit on the winner every so often.',
+      'CallIfLieNeeded': 'only calls bullshit if they would need to lie on their next turn.'
     }
     
     const opponent = this.state.otherPlayerStrategies[index]
