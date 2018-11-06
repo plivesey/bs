@@ -68,11 +68,11 @@ exports.CallIfLieNeeded = class CallIfLieNeeded {
  * Starts with a chance of calling out each player. Then, doubles this every time the player lies and halves it when they don't lie.
  */
 exports.CallUpdatingPercentage = class CallUpdatingPercentage {
-    constructor(percentage) {
+    constructor() {
         this.percentages = {
-            1: percentage,
-            2: percentage,
-            3: percentage
+            1: 0.1,
+            2: 0.1,
+            3: 0.1
         }
     }
 
@@ -95,8 +95,43 @@ exports.CallUpdatingPercentage = class CallUpdatingPercentage {
     }
 }
 
+exports.CallUpdatingPercentageOnWinner = class CallUpdatingPercentageOnWinner {
+    constructor() {
+        this.percentages = {
+            1: 0.025,
+            2: 0.025,
+            3: 0.025
+        }
+    }
+
+    callBullshit(state) {
+        if (alwaysCall(state)) {
+            return true
+        }
+
+        const allHands = state.otherPlayerCards
+        allHands.push(state.hand.count())
+        const winningNumberOfCards = Math.min(...allHands)
+
+        const againstWinner = state.otherPlayerCards[state.playerTurn - 1] !== winningNumberOfCards
+        const multiplier = againstWinner ? 4 : 1
+
+        return Math.random() < this.percentages[state.playerTurn] * multiplier
+    }
+
+    roundSummary(summary) {
+        if (summary.bullshitCalled) {
+            if (summary.playerLied) {
+                this.percentages[summary.playerTurn] *= 2
+            } else {
+                this.percentages[summary.playerTurn] /= 2
+            }
+        }
+    }
+}
+
 exports.CallPercentageOnWinner = class CallPercentageOnWinner extends CallPercentage {
-    constructor(percentage) {
+    constructor() {
         super(0.1)
     }
 

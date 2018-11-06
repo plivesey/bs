@@ -29,7 +29,7 @@ class LiePercentage {
         state.hand[state.currentCard] = 0
 
         if (cards.length > 0) {
-            if (Math.random() < this.percentage && state.hand.count() > 0 && cards.length < 4) {
+            if (Math.random() < this.percentage && state.hand.count() > 1 && cards.length < 3) {
                 cards.push(ideaLyingCardFromHand(state.hand, state.currentCard))
             }
 
@@ -143,10 +143,6 @@ class ExpectedValueLiar {
             extraCards = 3 - cards.length
         }
 
-        // console.log(this)
-        const handCount = state.hand.count() + cards.length
-        // console.log('hand count: ' + handCount + ' current hand: ' + cards + ' extra cards: ' + extraCards + ' discard: ' + state.discardSize + ' values: ' + expectedValueForOneCard + ' - ' + expectedValueForTwoCards + ' - ' + expectedValueForThreeCards)
-
         for (var i = 0; i < extraCards; i++) {
             if (state.hand.count() > 0 && cards.length < 4) {
                 var card = ideaLyingCardFromHand(state.hand, state.currentCard)
@@ -154,8 +150,6 @@ class ExpectedValueLiar {
                 state.hand[card]--
             }
         }
-
-        // console.log('result: ' + cards)
 
         return cards
     }

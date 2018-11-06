@@ -29,6 +29,7 @@ class Game {
         gameState.hand = Object.assign(new Hand(), this.hands[player])
         gameState.discardSize = this.discard.length
         gameState.currentCard = this.currentCard
+        gameState.turnNumber = this.turnNumber
 
         return gameState
     }
@@ -97,6 +98,8 @@ class Game {
 
             const hand = this.hands[this.turn]
 
+            // console.log('played: ' + discardedCards)
+
             // Discard the cards
             for (var i = 0; i < discardedCards.length; i++) {
                 var card = discardedCards[i]
@@ -150,6 +153,10 @@ class Game {
     informPlayersOfRoundSummary(playerIndex, cardsPlayed, bullshitCalled, callingPlayer, playerLied) {
         const callingPlayerAdjusted = bullshitCalled ? this.indexOfPlayerInRelationToCurrentPlayer(callingPlayer, playerIndex) : 0
         const state = this.summaryState(playerIndex, cardsPlayed, bullshitCalled, callingPlayerAdjusted, playerLied)
+
+        // if (playerIndex === 0) {
+        //     console.log(state)
+        // }
         
         return this.players[playerIndex].roundSummary(state).then(() => {
             if (playerIndex + 1 < 4) {
