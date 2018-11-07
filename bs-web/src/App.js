@@ -3,13 +3,13 @@ import './App.css';
 import { Game } from 'cl/game'
 import { Player, SyncPlayer } from 'cl/player'
 import { NeverCall, CallUpdatingPercentage, CallPercentageOnWinner, CallIfLieNeeded } from 'cl/callFunctions'
-import { AvoidLying, RallyCloser, Lie10Percent, RallyTime } from 'cl/playFunctions'
+import { AvoidLying, RallyCloser, Lie10Percent, RallyTime, AlwaysLie } from 'cl/playFunctions'
 
 const playingStrategies = {
+  'AlwaysLie': AlwaysLie,
   'AvoidLying': AvoidLying,
   'RallyCloser': RallyCloser,
-  'Lie10Percent': Lie10Percent,
-  'RallyTime': RallyTime
+  'Lie10Percent': Lie10Percent
 }
 
 const callingStrategies = {
@@ -75,10 +75,10 @@ class GameComponenet extends Component {
 
   startNewGame() {
     const goodPlayingStrategies = [
+      'AlwaysLie',
       'AvoidLying',
       'RallyCloser',
-      'Lie10Percent',
-      'RallyTime'
+      'Lie10Percent'
     ]
 
     const goodCallingStrategies = [
@@ -282,7 +282,7 @@ class GameComponenet extends Component {
       'AvoidLying': 'Avoids lying whenever possible',
       'RallyCloser': "If they can win without lying, they don't lie. Otherwise, they lie only when they are losing",
       'Lie10Percent': "Lies ten percent of the time",
-      'RallyTime': "Only lies when losing"
+      'AlwaysLie': "Always lies"
     }
     
     const callingDescriptions = {
