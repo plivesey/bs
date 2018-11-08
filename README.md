@@ -28,7 +28,7 @@ This should give you information on how to run various commands.
 
 To add your own strategies:
 
-1. Check out the files `playFunctions.js` and `callFuncitons.js`. There are several classes here which you can copy for your own strategies.
+1. Check out the files `playFunctions.js` and `callFunctions.js`. There are several classes here which you can copy for your own strategies.
 2. You can implement two functions for playing and calling. The first returns what you are playing or what you are calling depending on a certain state. You can see all the properties of the state in `game.js`. The other is a summary function which is called after each turn. You can use this to update internal metrics on how the game is going.
 3. In `bs.js`, add your new class to `playingStrategies` AND `orderedPlayingStrategies` or `callingStrategies` AND `orderedCallingStrategies`.
 4. Run `$ node ./bs.js YOUR_STRATEGY` and see how it does!
