@@ -19,7 +19,7 @@ You should start with:
 
 ```
 $ cd cl
-$ node ./bs.js =h
+$ node ./bs.js -h
 ```
 
 This should give you information on how to run various commands.
